@@ -9,8 +9,8 @@ const exportTasksReport = async (req, res) => {
     try {
         const tasks = await Task.find().populate("assignedTo", "name email");
         const workbook = new excelJS.Workbook()
-        const todayDate = new Date();
-        const worksheet = workbook.addWorksheet(`Task Report - ${todayDate}`)
+
+        const worksheet = workbook.addWorksheet("User Task Report")
 
 
         worksheet.columns = [
@@ -73,7 +73,7 @@ const exportUsersReport = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 taskCount: 0,
-                pendingTask: 0,
+                pendingTasks: 0,
                 inProgressTasks: 0,
                 completedTasks: 0,
             };
@@ -92,7 +92,7 @@ const exportUsersReport = async (req, res) => {
                         if (task.status === "In Progress") {
                             userTaskMap[assignedUser._id].inProgressTasks += 1;
                         }
-                        if (task.status === "Pending") {
+                        if (task.status === "Completed") {
                             userTaskMap[assignedUser._id].completedTasks += 1;
                         }
                     }
@@ -103,7 +103,7 @@ const exportUsersReport = async (req, res) => {
 
         const workbook = new excelJS.Workbook()
         const todayDate = new Date();
-        const worksheet = workbook.addWorksheet(`User Task Report ${todayDate}`)
+        const worksheet = workbook.addWorksheet("User Task Report")
 
 
         worksheet.columns = [
@@ -139,7 +139,11 @@ const exportUsersReport = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({ message: "Error exporting tasks", error: error.message })
+        console.error(error);
+        res.status(500).json({
+            message: "Error exporting tasks",
+            error: error.message,
+        });
     }
 };
 
